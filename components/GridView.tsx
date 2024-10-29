@@ -14,7 +14,7 @@ interface GridViewProps {
 
 function GridView({ data, searchData }: GridViewProps) {
   const [imageDataID, setImageDataID] = useState([]);
-  const [parsedData, setParsedData] = useState<any>([]);
+  // const [parsedData, setParsedData] = useState<any>([]);
   const contextValue = useContext(ViewContext);
   const [initialLoad, setInitialLoad] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -22,23 +22,26 @@ function GridView({ data, searchData }: GridViewProps) {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if session storage has searchData
     const storedSearchData = sessionStorage.getItem("searchData");
     if (storedSearchData) {
       setInitialLoad(false);
       getFullImageData(JSON.parse(storedSearchData));
+      // getSkillSummary();
     } else if (data?.length > 0 && !searchData) {
       setInitialLoad(true);
     } else {
       setInitialLoad(false);
     }
+  }, [data.length, searchData]);
+
+  // Handle search data and view changes
+  useEffect(() => {
     if (contextValue?.view === "grid" && searchData !== null) {
       getFullImageData(searchData);
-      // getSkillSummary();
     } else {
       setImageDataID([]);
     }
-  }, [searchData]);
+  }, [searchData, contextValue?.view]);
 
   const getFullImageData = async (searchData: IFormInputData) => {
     try {
@@ -64,28 +67,30 @@ function GridView({ data, searchData }: GridViewProps) {
     }
   };
 
-  const getSkillSummary = async () => {
-    try {
-      const fetchedData = await Promise.all(
-        data?.map(async (item: any) => {
-          const response = await axios.get(`/document/cv/${item.doc_id}`);
-          return response.data;
-        })
-      );
-      setLoading(true);
-      setParsedData(fetchedData);
-    } catch (error) {
-      console.log("Error fetching data", error);
-    } finally {
-      setLoading(true);
-    }
-  };
+  // const getSkillSummary = async () => {
+  //   try {
+  //     const fetchedData = await Promise.all(
+  //       data?.map(async (item: any) => {
+  //         const response = await axios.get(`/document/cv/${item.doc_id}`);
+  //         return response.data;
+  //       })
+  //     );
+  //     // setLoading(true);
+  //     setParsedData(fetchedData);
+  //   } catch (error) {
+  //     console.log("Error fetching data", error);
+  //   }
+  //   // finally {
+  //   //   setLoading(true);
+  //   // }
+  // };
 
   return (
     <div className="masonry-container bg-gray-100">
       {initialLoad && data?.length > 0 ? (
         data?.map((item: any, index) => (
           <div
+            key={item.doc_id}
             onClick={() => router.push(`/cv-detail/${item.doc_id}`)}
             className="masonry-item relative group cursor-pointer"
           >
@@ -110,13 +115,7 @@ function GridView({ data, searchData }: GridViewProps) {
                     </div>
                   </div>
                 ) : (
-                  <p className="text-sm">
-                    {
-                      parsedData?.find(
-                        (parsedId: any) => parsedId?._id == item.doc_id
-                      )?.parsed_cv?.all_skills
-                    }
-                  </p>
+                  <p className="text-sm">{item.doc_name}</p>
                 )}
               </div>
             </div>

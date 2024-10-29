@@ -4,7 +4,7 @@ import ListView from "@/components/ListView";
 import GridView from "@/components/GridView";
 import { ViewContext } from "./context/ViewContext";
 import { ApiDataContext } from "./context/ApiDataContext";
-import { SearchContext } from "./layout";
+import { SearchContext } from "./context/SearchContext";
 
 function Dashboard() {
   const apiContext = useContext(ApiDataContext);
@@ -13,7 +13,9 @@ function Dashboard() {
 
   const searchContext = useContext(SearchContext);
 
-  console.log("UseApiContext", apiData);
+  if(!apiContext){
+    throw new Error("Error occured");
+  }
 
   if (!searchContext) {
     throw new Error("Error occured");

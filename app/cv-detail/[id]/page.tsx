@@ -14,7 +14,7 @@ const CVDetailPage = ({ params }: { params: string }) => {
 
   useEffect(() => {
     fetchFullCV();
-  }, []);
+  });
 
   const fetchFullCV = async () => {
     try {
@@ -22,7 +22,7 @@ const CVDetailPage = ({ params }: { params: string }) => {
       console.log("Detail-CV", response.data.parsed_cv);
       setData(response.data.parsed_cv);
     } catch (error) {
-      console.error("Error fetching Data");
+      console.error("Error fetching Data", error);
     }
   };
 

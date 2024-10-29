@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card } from "./ui/card";
 import { FaUser, FaPhoneAlt, FaLinkedin, FaGithub } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { IFormInputData } from "@/interfaces/FormInputData";
 import { MdDeleteForever } from "react-icons/md";
 import { useToast } from "@/hooks/use-toast";
-import { ViewContext } from "@/app/dashboard/context/ViewContext";
+// import { ViewContext } from "@/app/dashboard/context/ViewContext";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,41 +32,19 @@ interface ListViewProps {
 }
 
 const ListView = ({ data, searchData }: ListViewProps) => {
-  const context = useContext(ViewContext);
+  // const context = useContext(ViewContext);
 
   const [individualData, setIndividualData] = useState<any>([]);
   const [erroData, setErrorData] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
-  const prevSearchData = useRef<IFormInputData | null>(null);
+  // const prevSearchData = useRef<IFormInputData | null>(null);
 
   const router = useRouter();
   const { toast } = useToast();
 
-  useEffect(() => {
-    const storedSearchData = sessionStorage.getItem("searchData");
-
-    if (storedSearchData) {
-      // If searchData exists in session storage, load the search results
-      fetchSearchData(JSON.parse(storedSearchData));
-    } else if (data?.length > 0 && !searchData) {
-      // If no searchData, load individual data by default
-      fetchAllData();
-    }
-  }, [data]);
-
-  useEffect(() => {
-    // Only fetch new search data if `searchData` changes
-    if (searchData) {
-      fetchSearchData(searchData);
-    }
-  }, [searchData]);
-  console.log("ListData", searchData);
-
-  // console.log("SearchData:", searchIDData);
-
-  const fetchAllData = async () => {
-    setLoading(true);
+  const fetchAllData = useCallback(async () => {
+    // setLoading(true);
 
     try {
       const fetchedData = await Promise.all(
@@ -83,12 +61,28 @@ const ListView = ({ data, searchData }: ListViewProps) => {
       setErrorData(true);
       console.log("Error fetching individual document data:", error);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
-  };
+  }, [data]);
+
+  useEffect(() => {
+    const storedSearchData = sessionStorage.getItem("searchData");
+
+    if (storedSearchData) {
+      fetchSearchData(JSON.parse(storedSearchData));
+    } else if (data?.length > 0 && !searchData) {
+      fetchAllData();
+    }
+  }, [data, fetchAllData, searchData]);
+
+  useEffect(() => {
+    if (searchData) {
+      fetchSearchData(searchData);
+    }
+  }, [searchData]);
 
   const fetchSearchData = async (searchData: IFormInputData) => {
-    setLoading(true);
+    // setLoading(true);
     try {
       const response = await axios.post(
         `/document/search_by_query`,
@@ -115,7 +109,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
     } catch (error) {
       console.log("Error fetching", error);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
@@ -160,7 +154,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
             {/* Basic Information */}
             <div className="flex flex-col gap-1 w-[25%] overflow-clip">
               <div className="flex mb-0 flex-col">
-                <h1 className="mb-1 text-base underline font-bold">
+                <h1 className="mb-1 text-base underline  underline-offset-2 font-bold">
                   {item?.parsed_cv.position
                     ? item?.parsed_cv.position.toUpperCase()
                     : ""}

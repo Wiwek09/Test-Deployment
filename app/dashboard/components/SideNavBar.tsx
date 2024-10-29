@@ -1,11 +1,5 @@
 "use client";
-import React, {
-  ChangeEvent,
-  FormEvent,
-  useState,
-  useContext,
-  useEffect,
-} from "react";
+import React, { ChangeEvent, FormEvent, useState, useContext } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -108,8 +102,9 @@ const SideNavBar = () => {
   const deleteAllCV = async () => {
     try {
       const response = await axios.delete(`/document/all_document`);
+
       if (response.status === 200 && apiData && apiData?.length > 0) {
-        setApiData && setApiData([]);
+        setApiData([]);
         toast({
           title: "Deletion Successful",
           description: "All files have been deleted successfully.",
@@ -123,6 +118,7 @@ const SideNavBar = () => {
         });
       }
     } catch (error) {
+      console.error("Error Deleting Data", error);
       toast({
         variant: "destructive",
         title: "An error occurred",
