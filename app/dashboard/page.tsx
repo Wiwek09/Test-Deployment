@@ -13,7 +13,7 @@ function Dashboard() {
 
   const searchContext = useContext(SearchContext);
 
-  if(!apiContext){
+  if (!apiContext) {
     throw new Error("Error occured");
   }
 

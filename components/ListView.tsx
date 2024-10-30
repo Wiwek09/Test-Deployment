@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import { Card } from "./ui/card";
 import { FaUser, FaPhoneAlt, FaLinkedin, FaGithub } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { IFormInputData } from "@/interfaces/FormInputData";
 import { MdDeleteForever } from "react-icons/md";
 import { useToast } from "@/hooks/use-toast";
-// import { ViewContext } from "@/app/dashboard/context/ViewContext";
+import { ViewContext } from "@/app/dashboard/context/ViewContext";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,7 +32,9 @@ interface ListViewProps {
 }
 
 const ListView = ({ data, searchData }: ListViewProps) => {
-  // const context = useContext(ViewContext);
+  const context = useContext(ViewContext);
+
+  const { view } = context;
 
   const [individualData, setIndividualData] = useState<any>([]);
   const [erroData, setErrorData] = useState(false);
@@ -43,16 +45,19 @@ const ListView = ({ data, searchData }: ListViewProps) => {
   const router = useRouter();
   const { toast } = useToast();
 
+  console.log("ListView", view);
+
   const fetchAllData = useCallback(async () => {
     // setLoading(true);
-
     try {
-      const fetchedData = await Promise.all(
+      let fetchedData = await Promise.all(
         data?.map(async (item: any) => {
           const response = await axios.get(`/document/cv/${item.doc_id}`);
           return response.data;
         })
       );
+
+      fetchedData = fetchedData.filter((item) => item !== null);
 
       setIndividualData(fetchedData);
       sessionStorage.setItem("individualData", JSON.stringify(fetchedData));
@@ -73,7 +78,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
     } else if (data?.length > 0 && !searchData) {
       fetchAllData();
     }
-  }, [data, fetchAllData, searchData]);
+  }, [data, searchData]);
 
   useEffect(() => {
     if (searchData) {
@@ -113,7 +118,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
     }
   };
 
-  console.log("Json-Data", individualData);
+  console.log("Json-Data-List-View", individualData);
 
   const deleteCV = async (id: string) => {
     try {

@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
-
 import { GoDotFill } from "react-icons/go";
 import axios from "@/utils/axiosConfig";
 import Image from "next/image";
@@ -86,7 +85,7 @@ const CVDetailPage = ({ params }: { params: string }) => {
             </div>
 
             <div className="flex w-[40%] flex-wrap flex-col gap-2 justify-end">
-              <div className="h-20 bg-white w-32 flex text-center justify-self-end self-end">
+              {/* <div className="h-20 bg-white w-32 flex text-center justify-self-end self-end">
                 <Image
                   className="bg-cover"
                   src={"/assets/qr.jpg"}
@@ -94,7 +93,7 @@ const CVDetailPage = ({ params }: { params: string }) => {
                   height={200}
                   width={200}
                 />
-              </div>
+              </div> */}
               <div>
                 <div className="flex gap-1">
                   <span>Phone Number :</span>
