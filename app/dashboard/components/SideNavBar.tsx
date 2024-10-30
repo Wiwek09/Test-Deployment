@@ -246,7 +246,7 @@ const SideNavBar = () => {
 
       {/* Delete All */}
 
-      <div className="py-9">
+      <div className="">
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button className="bg-red-500 hover:bg-red-800">Delete All</Button>
