@@ -14,7 +14,6 @@ export const ViewContext = createContext<ViewContextType | null>(null);
 
 // Create a provider component to wrap around the layout
 export const ViewProvider = ({ children }: { children: ReactNode }) => {
-  
   const [view, setView] = useState<ViewType>(() => {
     const storedView = sessionStorage.getItem("view") as ViewType;
     return storedView || "grid";
@@ -22,7 +21,9 @@ export const ViewProvider = ({ children }: { children: ReactNode }) => {
 
   // Update sessionStorage whenever the view state changes
   useEffect(() => {
-    sessionStorage.setItem("view", view);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("view", view);
+    }
   }, [view]);
 
   return (
