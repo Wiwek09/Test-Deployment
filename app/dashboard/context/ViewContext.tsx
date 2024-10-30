@@ -14,7 +14,7 @@ export const ViewContext = createContext<ViewContextType | null>(null);
 
 // Create a provider component to wrap around the layout
 export const ViewProvider = ({ children }: { children: ReactNode }) => {
-  const [view, setView] = useState<ViewType>("list");
+  const [view, setView] = useState<ViewType>("grid");
 
   return (
     <ViewContext.Provider value={{ view, setView }}>
