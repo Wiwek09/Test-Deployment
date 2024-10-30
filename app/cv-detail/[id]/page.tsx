@@ -10,11 +10,11 @@ import Image from "next/image";
 const CVDetailPage = ({ params }: { params: string }) => {
   const [data, setData] = useState<any>();
   const { id }: any = params;
-  const pdfUrl = `http://localhost:8000/cv/${id}.pdf`;
+  const pdfUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/cv/${id}.pdf`;
 
   useEffect(() => {
     fetchFullCV();
-  });
+  }, []);
 
   const fetchFullCV = async () => {
     try {

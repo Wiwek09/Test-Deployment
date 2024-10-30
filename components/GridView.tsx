@@ -95,7 +95,7 @@ function GridView({ data, searchData }: GridViewProps) {
             className="masonry-item relative group cursor-pointer"
           >
             <Image
-              src={`http://localhost:8000/cv_images/${item.image_id}.webp`}
+              src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/cv_images/${item.image_id}.webp`}
               alt={`Image ${index + 1}`}
               height={200}
               width={300}
@@ -129,7 +129,7 @@ function GridView({ data, searchData }: GridViewProps) {
             className="masonry-item relative group cursor-pointer"
           >
             <Image
-              src={`http://localhost:8000/cv_images/${item.img_id}.webp`}
+              src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/cv_images/${item.img_id}.webp`}
               alt={`Image ${index + 1}`}
               height={200}
               width={300}
