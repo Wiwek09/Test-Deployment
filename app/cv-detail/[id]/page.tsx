@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { GoDotFill } from "react-icons/go";
 import axios from "@/utils/axiosConfig";
-import Image from "next/image";
+
 
 const CVDetailPage = ({ params }: { params: string }) => {
   const [data, setData] = useState<any>();
