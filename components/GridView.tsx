@@ -33,7 +33,7 @@ function GridView({ data, searchData }: GridViewProps) {
 
   // Handle search data and view changes
   useEffect(() => {
-    if (contextValue?.view === "grid" && searchData !== null) {
+    if (searchData !== null) {
       getFullImageData(searchData);
     } else {
       setImageDataID([]);
