@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Card } from "./ui/card";
 import { FaUser, FaPhoneAlt, FaLinkedin, FaGithub } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
@@ -12,7 +12,7 @@ import Link from "next/link";
 import { IFormInputData } from "@/interfaces/FormInputData";
 import { MdDeleteForever } from "react-icons/md";
 import { useToast } from "@/hooks/use-toast";
-import { ViewContext } from "@/app/dashboard/context/ViewContext";
+// import { ViewContext } from "@/app/dashboard/context/ViewContext";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,9 +31,9 @@ interface ListViewProps {
 }
 
 const ListView = ({ data, searchData }: ListViewProps) => {
-  const context = useContext(ViewContext);
+  // const context = useContext(ViewContext);
 
-  const { view } = context;
+  // const { view } = context;
 
   const [allData, setAllData] = useState<any>([]);
   const [searchResults, setSearchResults] = useState<any>([]);
@@ -42,47 +42,37 @@ const ListView = ({ data, searchData }: ListViewProps) => {
 
   const { toast } = useToast();
 
-  const fetchAllData = useCallback(async () => {
-    // setLoading(true);
+  const fetchAllData = async () => {
+    const fetchedData: any[] = [];
 
-    if (data.length > 0) {
-      try {
-        const fetchedData = await Promise.all(
-          data?.map(async (item: any) => {
+    try {
+      if (data.length > 0) {
+        for (const item of data) {
+          try {
             const response = await axios.get(`/document/cv/${item.doc_id}`);
-            return response.data;
-          })
-        );
-
-        // fetchedData = fetchedData.filter((item) => item !== null);
-
-        setAllData(fetchedData);
+            if (response.status === 200) {
+              fetchedData.push(response.data);
+            }
+          } catch (error) {
+            // Stop fetching if an error occurs
+            console.error("Error fetching document:", error);
+            break;
+          }
+        }
+        setAllData(fetchedData); // Update with successfully fetched data
         setErrorData(false);
-      } catch (error) {
-        setErrorData(true);
-        console.log("Error fetching individual document data:", error);
-      } finally {
-        // setLoading(false);
       }
+    } catch (error) {
+      setErrorData(true);
+      console.error("General error in fetching data:", error);
     }
-  }, [data]);
-
-  // useEffect(() => {
-  //   const storedSearchData = sessionStorage.getItem("searchData");
-
-  //   if (storedSearchData) {
-  //     fetchSearchData(JSON.parse(storedSearchData));
-  //   }
-  //   // else if (data?.length > 0 && !searchData) {
-  //   //   fetchAllData();
-  //   // }
-  // }, [data, searchData]);
+  };
 
   useEffect(() => {
-    if (view === "list" && !isSearching) {
+    if (!isSearching) {
       fetchAllData();
     }
-  }, []);
+  }, [data, isSearching]);
 
   useEffect(() => {
     if (searchData) {
@@ -90,8 +80,6 @@ const ListView = ({ data, searchData }: ListViewProps) => {
       fetchSearchData(searchData);
     }
   }, [searchData]);
-
-  console.log("DataList", allData);
 
   const fetchSearchData = async (searchData: IFormInputData) => {
     // setLoading(true);
@@ -114,14 +102,12 @@ const ListView = ({ data, searchData }: ListViewProps) => {
             return response.data;
           })
         );
-        setSearchResults(fetchedData);
+        setSearchResults(fetchedData.filter((item) => item !== null));
       }
     } catch (error) {
       console.log("Error fetching", error);
     }
   };
-
-  // console.log("Json-Data-List-View", individualData);
 
   const deleteCV = async (id: string) => {
     try {
@@ -162,7 +148,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
 
   return (
     <div className="flex flex-col px-4 py-4 rounded-md bg-gray-100  h-[100vh] overflow-y-scroll space-y-5 scrollbar-thin ">
-      {displayedData?.length === 0 || erroData ? (
+      {displayedData?.length === 0 ? (
         <p>No Document Available</p>
       ) : (
         displayedData?.map((item: any) => (
