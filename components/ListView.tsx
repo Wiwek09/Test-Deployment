@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "./ui/card";
 import { FaUser, FaPhoneAlt, FaLinkedin, FaGithub } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
@@ -38,7 +38,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
   const [allData, setAllData] = useState<any>([]);
   const [searchResults, setSearchResults] = useState<any>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [erroData, setErrorData] = useState(false);
+  // const [erroData, setErrorData] = useState(false);
 
   const { toast } = useToast();
 
