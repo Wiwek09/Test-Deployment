@@ -9,7 +9,6 @@ import { Button } from "./ui/button";
 import { IDocumentData } from "@/interfaces/DocumentData";
 import axios from "@/utils/axiosConfig";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { IFormInputData } from "@/interfaces/FormInputData";
 import { MdDeleteForever } from "react-icons/md";
 import { useToast } from "@/hooks/use-toast";
@@ -36,55 +35,63 @@ const ListView = ({ data, searchData }: ListViewProps) => {
 
   const { view } = context;
 
-  const [individualData, setIndividualData] = useState<any>([]);
+  const [allData, setAllData] = useState<any>([]);
+  const [searchResults, setSearchResults] = useState<any>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [erroData, setErrorData] = useState(false);
-  // const [loading, setLoading] = useState(false);
 
-  // const prevSearchData = useRef<IFormInputData | null>(null);
-
-  const router = useRouter();
   const { toast } = useToast();
-
-  console.log("ListView", view);
 
   const fetchAllData = useCallback(async () => {
     // setLoading(true);
-    try {
-      let fetchedData = await Promise.all(
-        data?.map(async (item: any) => {
-          const response = await axios.get(`/document/cv/${item.doc_id}`);
-          return response.data;
-        })
-      );
 
-      fetchedData = fetchedData.filter((item) => item !== null);
+    if (data.length > 0) {
+      try {
+        const fetchedData = await Promise.all(
+          data?.map(async (item: any) => {
+            const response = await axios.get(`/document/cv/${item.doc_id}`);
+            return response.data;
+          })
+        );
 
-      setIndividualData(fetchedData);
-      sessionStorage.setItem("individualData", JSON.stringify(fetchedData));
-      setErrorData(false);
-    } catch (error) {
-      setErrorData(true);
-      console.log("Error fetching individual document data:", error);
-    } finally {
-      // setLoading(false);
+        // fetchedData = fetchedData.filter((item) => item !== null);
+
+        setAllData(fetchedData);
+        setErrorData(false);
+      } catch (error) {
+        setErrorData(true);
+        console.log("Error fetching individual document data:", error);
+      } finally {
+        // setLoading(false);
+      }
     }
   }, [data]);
 
-  useEffect(() => {
-    const storedSearchData = sessionStorage.getItem("searchData");
+  // useEffect(() => {
+  //   const storedSearchData = sessionStorage.getItem("searchData");
 
-    if (storedSearchData) {
-      fetchSearchData(JSON.parse(storedSearchData));
-    } else if (data?.length > 0 && !searchData) {
+  //   if (storedSearchData) {
+  //     fetchSearchData(JSON.parse(storedSearchData));
+  //   }
+  //   // else if (data?.length > 0 && !searchData) {
+  //   //   fetchAllData();
+  //   // }
+  // }, [data, searchData]);
+
+  useEffect(() => {
+    if (view === "list" && !isSearching) {
       fetchAllData();
     }
-  }, [data, searchData]);
+  }, []);
 
   useEffect(() => {
     if (searchData) {
+      setIsSearching(true);
       fetchSearchData(searchData);
     }
   }, [searchData]);
+
+  console.log("DataList", allData);
 
   const fetchSearchData = async (searchData: IFormInputData) => {
     // setLoading(true);
@@ -107,25 +114,24 @@ const ListView = ({ data, searchData }: ListViewProps) => {
             return response.data;
           })
         );
-        setIndividualData(fetchedData);
-        sessionStorage.setItem("searchData", JSON.stringify(searchData));
-        sessionStorage.setItem("individualData", JSON.stringify(fetchedData));
+        setSearchResults(fetchedData);
       }
     } catch (error) {
       console.log("Error fetching", error);
-    } finally {
-      // setLoading(false);
     }
   };
 
-  console.log("Json-Data-List-View", individualData);
+  // console.log("Json-Data-List-View", individualData);
 
   const deleteCV = async (id: string) => {
     try {
       const response = await axios.delete(`/document/document/${id}`);
       if (response.status === 200) {
         // Filter out the deleted document
-        setIndividualData((prevData: any) =>
+        setAllData((prevData: any) =>
+          prevData.filter((doc: any) => doc._id !== id)
+        );
+        setSearchResults((prevData: any) =>
           prevData.filter((doc: any) => doc._id !== id)
         );
         toast({
@@ -143,15 +149,23 @@ const ListView = ({ data, searchData }: ListViewProps) => {
       }
     } catch (error) {
       console.error("Error Deletion", error);
+      toast({
+        title: "Deletion Error",
+        variant: "destructive",
+        description: "An error occurred while deleting the document.",
+      });
     }
   };
 
+  const displayedData =
+    isSearching && searchResults.length > 0 ? searchResults : allData;
+
   return (
     <div className="flex flex-col px-4 py-4 rounded-md bg-gray-100  h-[100vh] overflow-y-scroll space-y-5 scrollbar-thin ">
-      {individualData?.length === 0 || erroData ? (
+      {displayedData?.length === 0 || erroData ? (
         <p>No Document Available</p>
       ) : (
-        individualData?.map((item: any) => (
+        displayedData?.map((item: any) => (
           <Card
             key={item._id}
             className="px-5 py-6 flex justify-between w-full shadow-lg transform mb-3  hover:border-[#7bf772]  transition duration-500 ease-in-out "
@@ -271,7 +285,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                   </span>
                   <span className=" text-gray-500">
                     {item?.parsed_cv.work_experience?.length > 0
-                      ? item?.parsed_cv.work_experience[0]?.responsibilities[0].slice(
+                      ? item?.parsed_cv.work_experience[0]?.responsibilities[0]?.slice(
                           0,
                           150
                         )
@@ -337,11 +351,10 @@ const ListView = ({ data, searchData }: ListViewProps) => {
               </div>
 
               <div className="flex self-end">
-                <Button
-                  className="rounded-3xl"
-                  onClick={() => router.push(`/cv-detail/${item._id}`)}
-                >
-                  View CV
+                <Button className="rounded-3xl">
+                  <Link href={`/cv-detail/${item._id}`} target="_blank">
+                    View CV
+                  </Link>
                 </Button>
               </div>
 
