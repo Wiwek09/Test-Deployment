@@ -60,10 +60,10 @@ const ListView = ({ data, searchData }: ListViewProps) => {
           }
         }
         setAllData(fetchedData); // Update with successfully fetched data
-        setErrorData(false);
+        // setErrorData(false);
       }
     } catch (error) {
-      setErrorData(true);
+      // setErrorData(true);
       console.error("General error in fetching data:", error);
     }
   };
